@@ -1,15 +1,24 @@
-// this is a decorator for the old existing reducer
+// this is a decorator for the old existing reducer (RSE exercise), which
+  // is adding the capability of undo/redo
 export const withUndoRedo = (reducer) => {
-  let oldState=[];
-  return (state, action) => {
-    oldState.push(state);
-
+  let past=[]; // using a closure
+  let lastUndoIndex;
+  lastUndoIndex = lastUndoIndex || 0;
+  return (state, action) => { // the internal function of the closure
+    if (past.length === 0 || action.type !== 'UNDO'){
+      past.push(state);
+    }
     if (state === undefined){
       return {
         canUndo: false,
         canRedo: false,
         ...reducer(state, action),
       };
+    }
+    if (action.type==='UNDO'){
+      lastUndoIndex++;
+      const returnedState = past[past.length - lastUndoIndex];
+      return {...returnedState}
     }
     const newPresent = reducer(state, action);
     if (
@@ -19,10 +28,6 @@ export const withUndoRedo = (reducer) => {
         ...newPresent,
         canUndo: true,
         canRedo: false,
-      }
-    } else {
-      if (action.type==='UNDO'){
-        return {...oldState[oldState.length - 2]}
       }
     }
     return state;

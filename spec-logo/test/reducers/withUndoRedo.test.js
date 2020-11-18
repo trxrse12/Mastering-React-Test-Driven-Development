@@ -78,9 +78,21 @@ describe('withUndoRedo', () => {
       newState = reducer(present, innerAction); // input present and returns future
     });
 
-    it.only('sets present to the latest past entry', () => {
+    it('can undo one level', () => {
       const updated  = reducer(newState, undoAction); // input future and undo
       expect(updated).toEqual(present); // returns present
+    });
+
+    it.only('can undo multiple levels', () => {
+      const futureFuture = {c: 345, nextInstructionId: 3};
+      decoratedReducedSpy.mockReturnValue(futureFuture);
+      newState = reducer(newState, innerAction);
+
+      const updated = reducer(
+        reducer(newState, undoAction),
+        undoAction
+      );
+      expect(updated).toEqual(present);
     });
   });
 });
