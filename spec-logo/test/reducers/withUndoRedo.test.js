@@ -80,10 +80,10 @@ describe('withUndoRedo', () => {
 
     it('can undo one level', () => {
       const updated  = reducer(newState, undoAction); // input future and undo
-      expect(updated).toEqual(present); // returns present
+      expect(updated).toMatchObject(present); // returns present
     });
 
-    it.only('can undo multiple levels', () => {
+    it('can undo multiple levels', () => {
       const futureFuture = {c: 345, nextInstructionId: 3};
       decoratedReducedSpy.mockReturnValue(futureFuture);
       newState = reducer(newState, innerAction);
@@ -92,7 +92,12 @@ describe('withUndoRedo', () => {
         reducer(newState, undoAction),
         undoAction
       );
-      expect(updated).toEqual(present);
+      expect(updated).toMatchObject(present);
+    });
+
+    it('sets canRedo to true after undoing', () => {
+      const updated = reducer(newState, undoAction);
+      expect(updated.canRedo).toBeTruthy();
     });
   });
 });

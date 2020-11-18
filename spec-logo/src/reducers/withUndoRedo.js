@@ -18,7 +18,10 @@ export const withUndoRedo = (reducer) => {
     if (action.type==='UNDO'){
       lastUndoIndex++;
       const returnedState = past[past.length - lastUndoIndex];
-      return {...returnedState}
+      return {
+        ...returnedState,
+        canRedo: true,
+      }
     }
     const newPresent = reducer(state, action);
     if (
