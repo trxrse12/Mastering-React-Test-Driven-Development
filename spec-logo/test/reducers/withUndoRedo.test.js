@@ -130,6 +130,8 @@ describe('withUndoRedo', () => {
       );
       expect(updated).toMatchObject(present);
     });
+
+    // see TECH_DEBT 001 in the docs folder
     it.skip('return undefined when attempting a do, undo, do, redo sequence', () => {
       decoratedReducedSpy.mockReturnValue(future);
       let newState = reducer(present, innerAction);
