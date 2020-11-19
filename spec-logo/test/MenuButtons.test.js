@@ -53,4 +53,34 @@ describe('MenuButtons', () => {
         .matching({ type: 'RESET' });
     });
   });
+
+  describe('undo button', () => {
+    it('renders', () => {
+      renderWithStore(<MenuButtons/>);
+      expect(button('Undo')).not.toBeNull();
+    });
+    it('is disabled if there is no history', () => {
+      renderWithStore(<MenuButtons/>);
+      expect(button('Undo').hasAttribute('disabled')).toBeTruthy();
+    });
+    it('is enabled if an action occurs', () => {
+      const store = renderWithStore(<MenuButtons/>);
+      store.dispatch({
+        type: 'SUBMIT_EDIT_LINE',
+        text: 'forward 10\n'
+      });
+      expect(button('Undo').hasAttribute('disabled')).toBeFalsy();
+    });
+    it('dispatches an action of UNDO when clicked', () => {
+      const store = renderWithStore(<MenuButtons/>);
+      store.dispatch({
+        type: 'SUBMIT_EDIT_LINE',
+        text: 'forward 10\n'
+      });
+      click(button('Undo'));
+      return expectRedux(store)
+        .toDispatchAnAction()
+        .matching({type: 'UNDO'});
+    });
+  });
 });

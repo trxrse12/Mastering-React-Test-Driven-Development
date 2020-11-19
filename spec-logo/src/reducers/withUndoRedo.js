@@ -9,7 +9,7 @@ export const withUndoRedo = (reducer) => {
   let lastRedoIndex;
 
   return (state, action) => { // the internal function of the closure
-    console.log('\n\n\n\n\n');
+    // console.log('\n\n\n\n\n');
     // console.log('SSSSSSSSSSSSSSSSSSSSSSSSSSs state=', state);
     // console.log('SSSSSSSSSSSSSSSSSSSSSSSSSSs action=', action?.type);
     if (past.length === 0 || action.type !== 'UNDO'){
