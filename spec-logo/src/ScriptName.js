@@ -9,13 +9,14 @@ const ifEnterKey = (e, func) => {
 
 const mapStateToProps = ({ script: { name } }) => ({ name });
 const mapDispatchToProps = {
-  submitScriptName: text => ({ type: 'SUBMIT_SCRIPT_NAME', text })
+  submitScriptName: text => ({ type: 'SUBMIT_SCRIPT_NAME', text }),
+  promptFocusRequest: () => ({type: 'PROMPT_FOCUS_REQUEST'})
 };
 
 export const ScriptName = connect(
   mapStateToProps,
   mapDispatchToProps
-)(({ name, submitScriptName }) => {
+)(({ name, submitScriptName, promptFocusRequest }) => {
   const [updatedScriptName, setScriptName] = useState(name);
   const [editingScriptName, setEditingScriptName] = useState(
     false
@@ -27,6 +28,7 @@ export const ScriptName = connect(
     if (editingScriptName) {
       toggleEditingScriptName();
       submitScriptName(updatedScriptName);
+      promptFocusRequest();
     }
   };
 

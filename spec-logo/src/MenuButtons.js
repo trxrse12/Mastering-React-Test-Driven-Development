@@ -5,20 +5,23 @@ import { initialState } from './parser';
 const mapStateToProps = ({ script }) => ({ script });
 const mapDispatchToProps = {
   reset: () => ({ type: 'RESET' }),
-  undo: () => ({type: 'UNDO'})
+  undo: () => ({type: 'UNDO'}),
+  redo: () => ({type: 'REDO'})
 };
 
 export const MenuButtons = connect(
   mapStateToProps,
   mapDispatchToProps
-)(({ script: {canUndo, nextInstructionId},
-                                       undo,
-                                       reset }) => {
+)(({ script: {canUndo, canRedo, nextInstructionId},
+  undo,
+  redo,
+  reset }) => {
   const canReset = nextInstructionId !== 0;
 
   return (
     <React.Fragment>
       <button onClick={undo} disabled={!canUndo}>Undo</button>
+      <button onClick={redo} disabled={!canRedo}>Redo</button>
       <button onClick={reset} disabled={!canReset}>
         Reset
       </button>

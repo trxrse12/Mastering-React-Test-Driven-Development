@@ -83,4 +83,36 @@ describe('MenuButtons', () => {
         .matching({type: 'UNDO'});
     });
   });
+
+  describe('redo button', () => {
+    it('renders', () => {
+      renderWithStore(<MenuButtons/>);
+      expect(button('Redo')).not.toBeNull();
+    });
+    it('is disabled if there is no history', () => {
+      renderWithStore(<MenuButtons/>);
+      expect(button('Redo').hasAttribute('disabled')).toBeTruthy();
+    });
+    it('is enabled if an action occurs', () => {
+      const store = renderWithStore(<MenuButtons/>);
+      store.dispatch({
+        type: 'SUBMIT_EDIT_LINE',
+        text: 'forward 10\n'
+      });
+      click(button('Undo'));
+      expect(button('Redo').hasAttribute('disabled')).toBeFalsy();
+    });
+    it('dispatches an action of REDO when clicked', () => {
+      const store = renderWithStore(<MenuButtons/>);
+      store.dispatch({
+        type: 'SUBMIT_EDIT_LINE',
+        text: 'forward 10\n'
+      });
+      click(button('Undo'));
+      click(button('Redo'));
+      return expectRedux(store)
+        .toDispatchAnAction()
+        .matching({type: 'REDO'});
+    });
+  });
 });

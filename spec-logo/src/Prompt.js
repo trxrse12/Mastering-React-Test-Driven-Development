@@ -1,17 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
 
-const mapStateToProps = ({ script: { nextInstructionId } }) => ({
-  nextInstructionId
+const mapStateToProps = ({
+  script: { nextInstructionId },
+  environment: {promptFocusRequest},
+}) => ({
+  nextInstructionId,
+  promptFocusRequest,
 });
 const mapDispatchToProps = {
-  submitEditLine: text => ({ type: 'SUBMIT_EDIT_LINE', text })
+  submitEditLine: text => ({ type: 'SUBMIT_EDIT_LINE', text }),
+  promptHasFocused: () => ({type: 'PROMPT_HAS_FOCUSED'}),
 };
 
 export const Prompt = connect(
   mapStateToProps,
   mapDispatchToProps
-)(({ nextInstructionId, submitEditLine }) => {
+)(({
+  nextInstructionId,
+  promptFocusRequest,
+  submitEditLine,
+  promptHasFocused,
+}) => {
   const handleKeyPress = e => {
     if (e.key === 'Enter') {
       setShouldSubmit(true);
@@ -43,6 +53,17 @@ export const Prompt = connect(
     setHeight(20);
   }
 
+  const inputRef = useRef();
+
+  useEffect(() => {
+    inputRef.current.focus();
+    promptHasFocused();
+  }, [inputRef, promptHasFocused]);
+
+  useEffect(() => {
+    inputRef.current.focus()
+  }, [promptFocusRequest]);
+
   return (
     <tbody key="prompt">
       <tr>
@@ -52,6 +73,7 @@ export const Prompt = connect(
             onScroll={handleScroll}
             value={editPrompt}
             style={{ height: height }}
+            ref={inputRef}
             onChange={handleChange}
             onKeyPress={handleKeyPress}
           />

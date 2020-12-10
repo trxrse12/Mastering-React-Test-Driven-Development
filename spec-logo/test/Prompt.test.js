@@ -2,6 +2,7 @@ import React from 'react';
 import { expectRedux } from 'expect-redux';
 import { createContainerWithStore } from './domManipulators';
 import { Prompt } from '../src/Prompt';
+import {act} from 'react-dom/test-utils';
 
 describe('Prompt', () => {
   let container, renderWithStore, change, keyPress;
@@ -66,6 +67,40 @@ describe('Prompt', () => {
 
     it('blanks the edit field', () => {
       expect(textArea().value).toEqual('');
+    });
+  });
+
+  describe('prompt focus', () => {
+    it('sets focus when the component first renders', () => {
+      renderInTableWithStore(<Prompt />);
+      expect(document.activeElement).toEqual(textArea())
+    });
+
+    // utility that removes focus from a form that is rendered in the test
+    const jsdomClearFocus = () => {
+      const node = document.createElement('input');
+      document.body.appendChild(node);
+      node.focus(); //artificially focuses on this temporary element,
+          // in order to remove the focus from the main form that is rendered in the test
+      node.remove();
+    };
+
+    // test that focus returns to the text area whenever I dispatch the PROMPT_FOCUS_REQUEST action
+    it('calls focus on the underlying DOM element if promptFocusRequest is true',async () => {
+      const store = renderInTableWithStore((<Prompt/>));
+      jsdomClearFocus();
+      act(() => {
+        store.dispatch({type: 'PROMPT_FOCUS_REQUEST'});
+      });
+      expect(document.activeElement).toEqual(textArea());
+    });
+
+    it('dispatches an action notifying that the prompt has focused', () => {
+      const store = renderWithStore(<Prompt/>);
+      store.dispatch({type: 'PROMPT_FOCUS_REQUEST'});
+      return expectRedux(store)
+        .toDispatchAnAction()
+        .matching({type: 'PROMPT_HAS_FOCUSED'});
     });
   });
 });
