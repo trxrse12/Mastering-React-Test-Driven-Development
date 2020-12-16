@@ -10,6 +10,6 @@ export const AnimatedLine = ({
     x2={x}
     y2={y}
     strokeWidth="2"
-    stroke="Black"
+    stroke="black"
   />
 );

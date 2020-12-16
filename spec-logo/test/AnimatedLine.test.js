@@ -64,6 +64,6 @@ describe('AnimatedLine', () => {
         turtle={turtle}
       />
     );
-    expect(line()).getAttribute('stroke').toEqual('black')
+    expect(line().getAttribute('stroke')).toEqual('black')
   });
 });
