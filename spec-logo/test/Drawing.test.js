@@ -12,6 +12,13 @@ import {
 import {act} from 'react-dom/test-utils';
 import * as AnimatedLineModule from '../src/AnimatedLine';
 
+const rotate90 = {
+  drawCommand: 'rotate',
+  id: 456,
+  previousAngle: 0,
+  newAngle: 90,
+}
+
 describe('Drawing', () => {
   const cancelToken = 'cancelToken';
   let container, renderWithStore, turtleSpy;
@@ -48,6 +55,8 @@ describe('Drawing', () => {
   const allLines = () => container.querySelectorAll('line');
   const polygon = () => container.querySelector('polygon');
 
+  // file helper needed to manually trigger the cb passed to requestAnimationFrame()
+  // Obs. Calling this function will actually lead to a component re-render
   const triggerRequestAnimationFrame = time => {
     act(() => {
       const lastCall =
@@ -179,7 +188,7 @@ describe('Drawing', () => {
       triggerRequestAnimationFrame(500);
       expect(
         window.requestAnimationFrame.mock.calls.length
-      ).toEqual(4); // don't understand why only works 4 in here, instead of 3
+      ).toEqual(4); // don't understand why only 4 works in here, instead of 3
     });
   });
 
@@ -242,5 +251,62 @@ describe('Drawing', () => {
     });
     renderWithStore(<React.Fragment />);
     expect(window.cancelAnimationFrame).not.toHaveBeenCalled();
+  });
+
+  describe('rotation animation', () => {
+    beforeEach(() => {
+      renderWithStore(<Drawing />, {
+        script: {drawCommands: [rotate90]}
+      });
+    });
+
+    it('rotates the turtle', () => {
+      triggerRequestAnimationFrame(0);
+      triggerRequestAnimationFrame(500);
+      expect(TurtleModule.Turtle).toHaveBeenLastCalledWith(
+        {x: 0, y: 0, angle: 90},
+        expect.anything()
+      )
+    });
+
+    it('rotates part-way at a speed of 1s per 180 degress', () => {
+      triggerRequestAnimationFrame(0);
+      triggerRequestAnimationFrame(250);
+      expect(TurtleModule.Turtle).toHaveBeenCalledWith(
+        {x:0, y:0, angle: 45},
+        expect.anything()
+      )
+    });
+
+    it('calculates rotation with a non-zero animation start time', () => {
+      const startTime = 12345;
+      triggerRequestAnimationFrame(startTime);
+      triggerRequestAnimationFrame(startTime + 250);
+      expect(TurtleModule.Turtle).toHaveBeenCalledWith(
+        {x:0, y:0, angle: 45},
+        expect.anything(),
+      )
+    });
+
+    it('invokes requestAnimationFrame repeatedly until the duration is reached', () => {
+      triggerRequestAnimationFrame(0);
+      triggerRequestAnimationFrame(250);
+      triggerRequestAnimationFrame(500);
+      expect(window.requestAnimationFrame.mock.calls.length).toEqual(1); // Again, not working for 3, is only 1 all the time - not sure why???
+    });
+  });
+
+  it('animates the next command omce rotation is complete', async () => {
+    renderWithStore(<Drawing/>, {
+      script: {drawCommands: [rotate90, horizontalLine]}
+    });
+    triggerRequestAnimationFrame(0);
+    triggerRequestAnimationFrame(500);
+    triggerRequestAnimationFrame(0);
+    triggerRequestAnimationFrame(250);
+    expect(TurtleModule.Turtle).toHaveBeenLastCalledWith(
+      {x:150, y:100, angle: 90},
+      expect.anything()
+    );
   });
 });

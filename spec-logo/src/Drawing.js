@@ -6,11 +6,14 @@ import {AnimatedLine} from "./AnimatedLine";
 
 const isDrawLineCommand = command =>
   command.drawCommand === 'drawLine';
+const isRotateCommand = command =>
+  command.drawCommand === 'rotate';
 
 const distance = ({x1, y1, x2, y2}) => Math.sqrt(
   (x2 - x1)**2 + (y2 - y1)**2
 );
 const movementSpeed = 5;
+const rotateSpeed = 1000 / 180; // (milliseconds / degrees)
 
 const mapStateToProps = ({
   script: { drawCommands }
@@ -32,10 +35,13 @@ export const Drawing = connect(
   const commandToAnimate = drawCommands[animatingCommandIndex];
   const isDrawingLine =
     commandToAnimate && isDrawLineCommand(commandToAnimate);
+  const isRotating =
+    commandToAnimate && isRotateCommand(commandToAnimate);
 
   useEffect(() => {
-    // console.log('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
     let start, duration, cancelToken;
+
+    // handler for drawings
     const handleDrawLineFrame = time => {
       if (start === undefined) start = time;
       if (time < start + duration){ // animate only for the max duration
@@ -53,6 +59,27 @@ export const Drawing = connect(
         )
       }
     };
+
+    // handler for rotations
+    const handleRotationFrame = time => {
+      if (start === undefined) start = time;
+      if (time < start + duration) {
+        const elapsed = time - start;
+        const {previousAngle, newAngle} = commandToAnimate;
+        setTurtle(turtle => ({
+          ...turtle,
+          angle:
+            previousAngle + (newAngle - previousAngle)* (elapsed/duration)
+        }));
+      } else {
+        setTurtle(turtle => ({
+          ...turtle,
+          angle: commandToAnimate.newAngle
+        }));
+        setAnimatingCommandIndex(animatingCommandIndex => animatingCommandIndex +1)
+      }
+    };
+
     if (isDrawingLine){
       // If it really needs to draw an animated line,
         // then first calculate the duration of the animation
@@ -66,6 +93,11 @@ export const Drawing = connect(
         // next render) and pass into it a time, so that the cb will next time use
         // (together with the the calcuated duration) to set the new turtle position
       requestAnimationFrame(handleDrawLineFrame)
+    } else if (isRotating) {
+      duration = rotateSpeed * Math.abs(
+        commandToAnimate.newAngle - commandToAnimate.previousAngle
+      );
+      requestAnimationFrame(handleRotationFrame)
     }
 
     return () => {
@@ -73,7 +105,7 @@ export const Drawing = connect(
         cancelAnimationFrame(cancelToken);
       }
     }
-  }, [commandToAnimate, isDrawingLine]);
+  }, [commandToAnimate, isDrawingLine, isRotating]);
 
   return (
     <div id="viewport">
