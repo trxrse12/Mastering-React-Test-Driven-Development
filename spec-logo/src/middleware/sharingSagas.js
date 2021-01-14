@@ -24,6 +24,7 @@ const buildUrl = (id) => {
   return `${protocol}://${host}${pathname}?watching=${id}`
 };
 
+// used by the server
 function* startSharing() {
   presenterSocket = yield openWebSocket(); // this is the socket returned by the promise
   presenterSocket.send(JSON.stringify({type: 'START_SHARING'}));
@@ -35,6 +36,7 @@ function* startSharing() {
   })
 }
 
+// used by the server
 function* stopSharing() {
   presenterSocket.close();
   yield put({type: 'STOPPED_SHARING'});

@@ -53,14 +53,14 @@ app.ws('/share', function(ws, req) {
         };
         nextSessionId++;
         break;
-      case 'START_WATCHING':
+      case 'START_WATCHING': // message from the client
         session = sessions[request.id];
         if (session) {
           session.subscribers = [...session.subscribers, ws];
           session.history.forEach(obj => sendJson(ws, obj));
         }
         break;
-      case 'NEW_ACTION':
+      case 'NEW_ACTION': // message from the presenter
         session = sessions[findSessionId(ws)];
         sendToSubscribers(session, request.innerAction);
         session.history = [...session.history, request.innerAction];

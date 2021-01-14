@@ -144,7 +144,7 @@ describe('sharing saga', () => {
     });
   });
 
-  describe('START_SHARING', () => {
+  describe('STOP_SHARING', () => {
     it('calls close on the open socket', async () => {
       await startSharing();
       store.dispatch({type: 'STOP_SHARING'});
