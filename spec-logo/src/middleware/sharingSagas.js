@@ -46,6 +46,7 @@ function* startSharing() {
   });
 }
 
+
 function* stopSharing() {
   presenterSocket.close();
   yield put({ type: 'STOPPED_SHARING' });
