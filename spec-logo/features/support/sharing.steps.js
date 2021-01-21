@@ -1,9 +1,5 @@
 import {Given, When, Then, AfterAll} from '@cucumber/cucumber';
-import puppeteer from 'puppeteer';
 import expect from 'expect'; // use jest in cucumber
-
-const port = process.env.port || 3000;
-const appPage = `http://localhost:${port}/index.html`;
 
 // necessary to make cucumber.js exit after
 AfterAll(function(){
@@ -11,10 +7,7 @@ AfterAll(function(){
 });
 
 Given('the presenter navigated to the application page', {timeout: 60 * 1000}, async function() {
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-  await page.goto(appPage);
-  this.setPage('presenter', page);
+    await this.browseToPageFor('presenter', this.appPage());
 });
 
 Given('the presenter clicked the button {string}',
@@ -22,14 +15,15 @@ Given('the presenter clicked the button {string}',
     await this.getPage('presenter').click(`button#${buttonId}`)
 });
 
+Given('the user navigated to the application page',{timeout: 60 * 1000}, async function () {
+  await this.browseToPageFor('user', this.appPage());
+});
+
 When('the observer navigates to the presenter\'s sharing link', async function(){
   await this.getPage('presenter').waitForSelector('a');
   const link = await this.getPage('presenter').$eval('a', a => a.getAttribute('href'));
   const url = new URL(link);
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-  await page.goto(url);
-  this.setPage('observer', page);
+  await this.browseToPageFor('observer',url);
 });
 
 Then('the observer should see a message saying {string}', async function (message){

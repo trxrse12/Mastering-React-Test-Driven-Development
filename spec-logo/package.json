@@ -12,7 +12,7 @@
     "build-server": "babel server/src -d dist/server",
     "test-server": "jest --config server/test/jest.json",
     "serve": "npm run build && node dist/server/server.js",
-    "cucumber": "cucumber-js --require-module @babel/register --publish-quiet"
+    "cucumber": "npm run build && cucumber-js --require-module @babel/register --publish-quiet"
   },
   "author": "",
   "license": "ISC",

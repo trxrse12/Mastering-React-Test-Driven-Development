@@ -5,5 +5,5 @@ Before(function() {
 });
 
 After(function () {
-  this.closeServer
+  this.closeServer();
 });
