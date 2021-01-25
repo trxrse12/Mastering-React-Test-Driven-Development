@@ -36,3 +36,13 @@ Then(
     expect(pageText).toContain(message);
   }
 );
+
+When('the presenter entered the following instructions at the prompt:', async function(dataTable){
+  for (let instruction of dataTable.raw()){
+    await this.getPage('presenter').type(
+      'textarea',
+      `${instruction}\n`
+    );
+  }
+  await this.getPage('presenter').waitFor(3500); // wait to finish the animation
+});
