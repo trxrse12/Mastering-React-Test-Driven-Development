@@ -1,5 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import {Dialog} from './Dialog';
+const {useState } = React;
 
 const SharingUrl = ({ url }) => (
   <p>
@@ -35,6 +37,9 @@ export const MenuButtons = connect(
     startSharing,
     stopSharing
   }) => {
+    const [ isSharingDialogOpen, setIsSharingDialogOpen] = useState(false);
+    const openSharingDialog = () => setIsSharingDialogOpen(true);
+
     const canReset = nextInstructionId !== 0;
     return (
       <React.Fragment>
@@ -55,7 +60,7 @@ export const MenuButtons = connect(
         <button onClick={redo} disabled={!canRedo}>
           Redo
         </button>
-        <button onClick={reset} disabled={!canReset}>
+        <button id='reset' onClick={reset} disabled={!canReset}>
           Reset
         </button>
         {environment.isSharing ? (
@@ -63,10 +68,21 @@ export const MenuButtons = connect(
             Stop sharing
           </button>
         ) : (
-          <button id="startSharing" onClick={startSharing}>
+          <button id="startSharing" onClick={openSharingDialog}>
             Start sharing
           </button>
         )}
+        {isSharingDialogOpen ? (
+          <Dialog
+            message="Do you want to share your previous commands, or would you like to reset to a blank script?"
+            buttons={[
+              {id: 'keep', text: 'Share previous'},
+              {id: 'reset', text: 'Reset'},
+            ]}
+            onClose = {() => setIsSharingDialogOpen(false)}
+          />
+        ) : null}
+
       </React.Fragment>
     );
   }

@@ -12,7 +12,8 @@
     "build-server": "babel server/src -d dist/server",
     "test-server": "jest --config server/test/jest.json",
     "serve": "node dist/server/server.js",
-    "cucumber": "npm run build && cucumber-js --require-module @babel/register"
+    "cucumber": "npm run build && cucumber-js --require-module @babel/register",
+    "test:e2e": "nodemon --watch src --watch features -x 'npm run cucumber'"
   },
   "author": "",
   "license": "ISC",
@@ -22,6 +23,7 @@
     "@babel/runtime": "^7.3.4",
     "express": "^4.16.4",
     "express-ws": "^4.0.0",
+    "nodemon": "^2.0.7",
     "react": "^16.9.0-alpha.0",
     "react-dom": "^16.9.0-alpha.0",
     "react-redux": "^7.0.2",
