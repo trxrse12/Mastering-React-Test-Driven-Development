@@ -213,12 +213,23 @@ describe('MenuButtons', () => {
       expect(button('Start sharing')).not.toBeNull();
     });
 
-    it.skip('dispatches an action of START_SHARING when start sharing is clicked', () => {
+    const makeDialogChoice = button => {
+      const lastCall =
+        DialogModule.Dialog.mock.calls[
+          DialogModule.Dialog.mock.calls.length - 1
+          ];
+      lastCall[0].onChoose(button);
+    };
+
+    it('dispatches an action of START_SHARING when start sharing is clicked', () => {
       const store = renderWithStore(<MenuButtons />);
       click(button('Start sharing'));
+
+      makeDialogChoice('reset');
+
       return expectRedux(store)
         .toDispatchAnAction()
-        .matching({ type: 'START_SHARING' });
+        .matching({ type: 'START_SHARING', reset: true });
     });
 
     it('opens a dialog when start sharing is clicked', () => {
@@ -253,13 +264,22 @@ describe('MenuButtons', () => {
       expect(container.querySelector('#dialog')).toBeNull();
     });
 
+    it('dispatches an action of START_SHARING when dialog onChoose prop is invoked with share', () => {
+      const store = renderWithStore(<MenuButtons/>);
+      click(button('Start sharing'));
+      makeDialogChoice('share');
+      return expectRedux(store)
+        .toDispatchAnAction()
+        .matching({type: 'START_SHARING', reset: false})
+    });
+
     const notifySocketOpened = async () => {
       await act(async () => {
         socketSpy.onopen();
       });
     };
 
-    it.skip('dispatches an action of STOP_SHARING when stop sharing is clicked', async () => {
+    it('dispatches an action of STOP_SHARING when stop sharing is clicked', async () => {
       const store = renderWithStore(<MenuButtons />);
       store.dispatch({ type: 'STARTED_SHARING' });
       await notifySocketOpened();

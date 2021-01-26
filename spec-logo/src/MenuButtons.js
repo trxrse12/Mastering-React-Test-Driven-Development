@@ -19,7 +19,7 @@ const mapDispatchToProps = {
   undo: () => ({ type: 'UNDO' }),
   redo: () => ({ type: 'REDO' }),
   skipAnimating: () => ({ type: 'SKIP_ANIMATING' }),
-  startSharing: () => ({ type: 'START_SHARING' }),
+  startSharing: (button) => ({ type: 'START_SHARING', reset: button === 'reset' }),
   stopSharing: () => ({ type: 'STOP_SHARING' })
 };
 
@@ -80,6 +80,7 @@ export const MenuButtons = connect(
               {id: 'reset', text: 'Reset'},
             ]}
             onClose = {() => setIsSharingDialogOpen(false)}
+            onChoose={startSharing}
           />
         ) : null}
 
